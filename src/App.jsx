@@ -4,6 +4,7 @@ export default function App(){
 
   const [newItem, setNewItem] = useState("");
   const [todos, setTodos] = useState([]);
+  const [filter, setFilter] = useState('all'); 
 
   function handleSubmit(e){
     e.preventDefault();
@@ -31,15 +32,45 @@ export default function App(){
     })
   }
 
-  function deleteTodos(){
+  function deleteTodo(id){
     setTodos(currentTodos => {
-      return currentTodos.filter(todo =>{
-        if(todo.completed === false){
+      return currentTodos.filter(todo => {
+        if(todo.id !== id){
           return {...todo}
         }
       })
-    });
+    })
   }
+
+  function displayActiveTodos(){
+    setFilter('active'); 
+  }
+
+  function displayCompleteTodos(){
+    setFilter('completed'); 
+  }
+
+  function allTodo(){
+    setFilter('all'); 
+  }
+
+  function clearCompleteTodo(){
+    setTodos(todos.filter(todo => !todo.completed));
+  }
+
+  function getVisibleTodos() {
+    if (filter === 'active') {
+      return todos.filter(todo => !todo.completed);
+    } else if (filter === 'completed') {
+      return todos.filter(todo => todo.completed);
+    } else if(filter === 'none'){
+      clearCompleteTodo();
+    }else{
+      return todos;
+    }
+  }
+
+  const visibleTodos = getVisibleTodos();
 
   console.log(todos)
 
@@ -64,7 +95,7 @@ export default function App(){
       <section>
         {todos.length === 0 && <h2>No todos today 😘</h2>}
         <ul>
-          {todos.map((todo) => {
+          {visibleTodos.map((todo) => {
             return (
                 <li key={todo.id}>
                   <label>
@@ -75,6 +106,7 @@ export default function App(){
                     />
                     {todo.title}
                   </label>
+                  <button onClick={() => deleteTodo(todo.id)}>Delete</button>
                 </li>
                 )
             })}
@@ -83,11 +115,11 @@ export default function App(){
         <div>
           <p><span>{todos.length} </span>items left</p>
             <div>
-              <p>All</p>
-              <p>Active</p>
-              <p>Completed</p>
+              <button onClick={allTodo}>All</button>
+              <button onClick={displayActiveTodos}>Active</button>
+              <button onClick={displayCompleteTodos}>Completed</button>
             </div>
-            <button onClick={deleteTodos}>Clear Completed</button>
+            <button onClick={clearCompleteTodo}>Clear Completed</button>
         </div>
       </section>
     </main>
