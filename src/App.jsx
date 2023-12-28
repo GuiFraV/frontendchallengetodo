@@ -1,15 +1,23 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 export default function App(){
 
   const [newItem, setNewItem] = useState("");
-  const [todos, setTodos] = useState([]);
   const [filter, setFilter] = useState('all'); 
+  
+  const [todos, setTodos] = useState(() => {
+    const localValue = localStorage.getItem("todos")
+    if(localValue == null) return []
+    return JSON.parse(localValue)
+  });
+
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos))
+  },[todos])
 
   function handleSubmit(e){
     e.preventDefault();
-    
     
     setTodos(currentTodos => {
       return [
