@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 export default function App(){
 
@@ -72,6 +73,21 @@ export default function App(){
 
   const visibleTodos = getVisibleTodos();
 
+  function handleDragEnd(result) {
+    if (!result.destination) return;
+
+    const newVisibleTodos = Array.from(visibleTodos);
+    const [reorderedTodo] = newVisibleTodos.splice(result.source.index, 1);
+    newVisibleTodos.splice(result.destination.index, 0, reorderedTodo);
+
+    const newTodos = todos.map(todo => {
+      const index = newVisibleTodos.findIndex(t => t.id === todo.id);
+      return index !== -1 ? newVisibleTodos[index] : todo;
+    });
+
+    setTodos(newTodos);
+  }
+
   console.log(todos)
 
   return(
@@ -94,23 +110,33 @@ export default function App(){
 
       <section>
         {todos.length === 0 && <h2>No todos today 😘</h2>}
-        <ul>
-          {visibleTodos.map((todo) => {
-            return (
-                <li key={todo.id}>
-                  <label>
-                    <input 
-                      type="checkbox" 
-                      checked={todo.completed} 
-                      onChange={e => toggleTodo(todo.id, e.target.checked)}
-                    />
-                    {todo.title}
-                  </label>
-                  <button onClick={() => deleteTodo(todo.id)}>Delete</button>
-                </li>
-                )
-            })}
-        </ul>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="todos">
+            {(provided) => (
+              <ul {...provided.droppableProps} ref={provided.innerRef}>
+                {visibleTodos.map((todo, index) => (
+                  <Draggable key={todo.id} draggableId={todo.id} index={index}>
+                    {(provided) => (
+                      <li {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+                        <label>
+                          <input 
+                            type="checkbox" 
+                            checked={todo.completed} 
+                            onChange={e => toggleTodo(todo.id, e.target.checked)}
+                          />
+                          {todo.title}
+                        </label>
+                        <button onClick={() => deleteTodo(todo.id)}>Delete</button>
+                      </li>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </ul>
+            )}
+          </Droppable>
+        </DragDropContext>
+    
 
         <div>
           <p><span>{todos.length} </span>items left</p>
@@ -131,3 +157,4 @@ export default function App(){
     </>
   )
 }
+
