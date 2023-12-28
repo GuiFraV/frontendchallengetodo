@@ -76,14 +76,10 @@ export default function App(){
   function handleDragEnd(result) {
     if (!result.destination) return;
 
-    const newVisibleTodos = Array.from(visibleTodos);
-    const [reorderedTodo] = newVisibleTodos.splice(result.source.index, 1);
-    newVisibleTodos.splice(result.destination.index, 0, reorderedTodo);
-
-    const newTodos = todos.map(todo => {
-      const index = newVisibleTodos.findIndex(t => t.id === todo.id);
-      return index !== -1 ? newVisibleTodos[index] : todo;
-    });
+    const newTodos = Array.from(todos);
+    const visibleTodoIndices = visibleTodos.map(todo => todos.findIndex(t => t.id === todo.id));
+    const [reorderedTodo] = newTodos.splice(visibleTodoIndices[result.source.index], 1);
+    newTodos.splice(visibleTodoIndices[result.destination.index], 0, reorderedTodo);
 
     setTodos(newTodos);
   }
