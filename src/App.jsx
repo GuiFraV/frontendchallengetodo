@@ -51,16 +51,8 @@ export default function App(){
     })
   }
 
-  function displayActiveTodos(){
-    setFilter('active'); 
-  }
-
-  function displayCompleteTodos(){
-    setFilter('completed'); 
-  }
-
-  function allTodo(){
-    setFilter('all'); 
+  function displayTodos(state){
+    setFilter(state);
   }
 
   function clearCompleteTodo(){
@@ -72,12 +64,12 @@ export default function App(){
       return todos.filter(todo => !todo.completed);
     } else if (filter === 'completed') {
       return todos.filter(todo => todo.completed);
-    } else if(filter === 'none'){
-      clearCompleteTodo();
     }else{
       return todos;
     }
   }
+
+  console.log(filter)
 
   const visibleTodos = getVisibleTodos();
 
@@ -145,9 +137,9 @@ export default function App(){
         <div>
           <p><span>{todos.length} </span>items left</p>
             <div>
-              <button onClick={allTodo}>All</button>
-              <button onClick={displayActiveTodos}>Active</button>
-              <button onClick={displayCompleteTodos}>Completed</button>
+              <button onClick={() => displayTodos('all')}>All</button>
+              <button onClick={() => displayTodos('active')}>Active</button>
+              <button onClick={() => displayTodos('completed')}>Completed</button>
             </div>
             <button onClick={clearCompleteTodo}>Clear Completed</button>
         </div>
